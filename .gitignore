@@ -3,4 +3,5 @@ obj
 *.make
 Makefile
 
+jmsearch
 JMdict_e.xml
