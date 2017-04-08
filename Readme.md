@@ -57,8 +57,9 @@ If you're feeling adventurous you can also change the path in the sources
 	- Run a list of A LOT OF WORDS (dictionary & all 4-letter combinations) against Romaji2Hiragana and Romaji2Katakana to make sure it doesn't hang up
 	- Run the whole dictionary against Kana2Romaji
 - Search for similar sounding words e.g.
-	- せけん (seken) -> せっけん (sekken)
-	- しょねん (shonen) -> しょうねん (shounen)
+	- せけん (seken) = world -> せっけん (sekken) = soap
+	- しょねん (shonen) = first year -> しょうねん (shounen) = boy
+	- れそこ (resoko) = ???? -> れいぞうこ (reizouko) = fridge
 - Use a settings file for enabling and disabling that stuff ^
 - Create option to show romaji of words
 - **Implement incremental search** (That's why there's a SearchState already)
