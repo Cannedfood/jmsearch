@@ -26,7 +26,7 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 				*s = alloc.allocateString(keb->value(), keb->value_size());
 			}
 			else {
-				puts("Not enough kanji space!");
+				// puts("Not enough kanji space!");
 				break;
 			}
 		}
@@ -40,7 +40,7 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 				*s = alloc.allocateString(reb->value(), reb->value_size());
 			}
 			else {
-				puts("Not enough kana space!");
+				// puts("Not enough kana space!");
 				break;
 			}
 		}
