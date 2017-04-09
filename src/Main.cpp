@@ -43,14 +43,14 @@ int main(int argc, char** argv) {
 
 			if(w->mKanji[0]) {
 				printf("%s", w->mKanji[0]);
-				for (size_t i = 0; i < sizeof(w->mKanji) / sizeof(const char*) && w->mKanji[i]; i++)
+				for (size_t i = 1; i < sizeof(w->mKanji) / sizeof(const char*) && w->mKanji[i]; i++)
 					printf(" / %s", w->mKanji[i]);
 				printf("\n   ");
 			}
 
 			if(w->mKana[0]) {
 				printf("%s", w->mKana[0]);
-				for (size_t i = 0; i < sizeof(w->mKana) / sizeof(const char*) && w->mKana[i]; i++)
+				for (size_t i = 1; i < sizeof(w->mKana) / sizeof(const char*) && w->mKana[i]; i++)
 					printf(" / %s", w->mKana[i]);
 				printf("\n");
 			}
