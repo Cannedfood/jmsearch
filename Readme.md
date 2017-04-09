@@ -51,8 +51,8 @@ If you're feeling adventurous you can also change the path in the sources
 
 ## TODO:
 (< means WIP)
-- Sort search results by how much they match <
-- Sort search results by relevance
+- Sort search results by how much they match **DONE**
+- Sort search results by relevance <
 - Clean up code & make more robust
 	- Run a list of A LOT OF WORDS (dictionary & all 4-letter combinations) against Romaji2Hiragana and Romaji2Katakana to make sure it doesn't hang up
 	- Run the whole dictionary against Kana2Romaji

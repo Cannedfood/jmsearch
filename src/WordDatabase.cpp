@@ -50,26 +50,71 @@ bool WordDatabase::load(const char *path) {
 	return true;
 }
 
+static
+bool testRelevance(SearchState* state, const char* test, bool lowercasify, float* pRelevance) {
+	const char* m0 = test;
+	const char* m  = test;
+
+	while(*m) {
+		if(*m == state->mTerm[0]) {
+			if(lowercasify) {
+				for (size_t k = 0; k < state->mTerm.size(); k++) {
+					if(m[k] == '\0' || state->mTerm[k] != tolower(m[k]))
+						goto CONTINUE_OUTER;
+				}
+			}
+			else {
+				for (size_t k = 0; k < state->mTerm.size(); k++) {
+					if(m[k] == '\0' || state->mTerm[k] != m[k])
+						goto CONTINUE_OUTER;
+				}
+			}
+
+			*pRelevance = 0;
+
+			size_t m0len = strlen(m0);
+
+			// Matching factor
+			if(m == m0) { // Word at begin
+				if(m0len == state->mTerm.size())
+					*pRelevance += state->mRelevance.matchExact;
+				else
+					*pRelevance += state->mRelevance.matchAtBegin;
+			}
+			else if(m == m0 + m0len - state->mTerm.size()) {
+				*pRelevance += state->mRelevance.matchSomewhere;
+			}
+
+			// TODO: Word relevance
+
+			// Alphabetic factors
+			*pRelevance += state->mRelevance.length / m0len;
+			// TODO: actual alphabetic sorting
+
+			return *pRelevance > state->mRelevance.cutoff;
+		}
+		CONTINUE_OUTER:
+		m++;
+	}
+
+	return false;
+}
+
 void WordDatabase::searchMeaning(SearchState* state) {
 	Timer t;
 
-	state->mResultIndices.clear();
+	float relevance;
 
 	const std::string& s = state->mTerm;
 	for (size_t i = 0; i < mWords.size(); i++) {
 		for (const char* m : mWords[i].mMeaning) {
 			if(!m) break;
-			while(*m) {
-				if(*m == s[0]) {
-					for (size_t k = 0; k < s.size(); k++) {
-						if(m[k] == '\0' || s[k] != m[k])
-							goto NEXT_WORD;
-					}
-					state->mResultIndices.emplace(i);
-				}
-				m++;
+			if(testRelevance(state, m, true, &relevance)) {
+				state->mResults.emplace_back(SearchResult {
+					&mWords[i],
+					relevance
+				});
 			}
-			NEXT_WORD:;
 		}
 	}
 
@@ -79,36 +124,29 @@ void WordDatabase::searchMeaning(SearchState* state) {
 void WordDatabase::searchKana(SearchState* state) {
 	Timer t;
 
-	state->mResultIndices.clear();
+	float relevance;
 
 	const std::string& s = state->mTerm;
 	for (size_t i = 0; i < mWords.size(); i++) {
 		for (const char* m : mWords[i].mKana) {
 			if(!m) break;
-			while(*m) {
-				if(*m == s[0]) {
-					for (size_t k = 0; k < s.size(); k++) {
-						if(m[k] == '\0' || s[k] != m[k])
-							goto NEXT_WORD;
-					}
-					state->mResultIndices.emplace(i);
-				}
-				m++;
+			if(testRelevance(state, m, false, &relevance)) {
+				state->mResults.emplace_back(SearchResult {
+					&mWords[i],
+					relevance
+				});
 			}
-			NEXT_WORD:;
 		}
 	}
 
 	state->mTime = t.milliseconds();
 }
 
-void WordDatabase::resolveResults(SearchState* state) {
-	state->mResults.clear();
-	state->mResults.reserve(state->mResultIndices.size());
-	for(size_t i : state->mResultIndices) {
-		state->mResults.push_back(&mWords[i]);
-	}
-	// TODO: sort state->mResults
+void WordDatabase::sortResults(SearchState* state) {
+	// Using stable sort because we will presort the list of words
+	std::stable_sort(state->mResults.begin(), state->mResults.end(), [](const auto& a, const auto& b) {
+		return a.relevance < b.relevance;
+	});
 }
 
 

@@ -33,10 +33,12 @@ int main(int argc, char** argv) {
 			database.searchMeaning(&search);
 		}
 
-		database.resolveResults(&search);
+		database.sortResults(&search);
 
-		std::reverse(search.mResults.begin(), search.mResults.end());
-		for(Word* w : search.mResults) {
+		// std::reverse(search.mResults.begin(), search.mResults.end());
+		for(const SearchResult& result : search.mResults) {
+			Word* w = result.word;
+
 			printf(" - ");
 
 			if(w->mKanji[0]) {
@@ -60,5 +62,6 @@ int main(int argc, char** argv) {
 		}
 
 		printf(" [ %zu results for \"%s\" in %zums ]\n", search.mResults.size(), search.mTerm.c_str(), search.mTime);
+		search.mResults.clear();
 	}
 }
