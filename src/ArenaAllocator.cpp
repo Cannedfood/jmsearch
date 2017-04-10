@@ -4,40 +4,46 @@
 #include <cstdlib>
 #include <cstdio>
 
-void* ArenaAllocator::allocate(size_t n) {
-	char* result = mStackAllocator.allocate(n);
 
-	if(!result) // -> remaining space too small
-	{
-		if(!mStackAllocator.empty()) {
-			mWasted += mStackAllocator.remaining();
-			mData.emplace_back(std::move(mStackAllocator.mBlock));
-		}
-		mStackAllocator = StackAllocator(std::max(n * 2, mBlockSize));
-		mSize += mStackAllocator.mSize;
-		result = mStackAllocator.allocate(n);
+ArenaAllocator::ArenaAllocator(size_t block_size) :
+	mTotal(0),
+	mWasted(0),
+	mData(),
+	mBlockSize(block_size),
+	mStack(nullptr),
+	mStackSize(0),
+	mStackUsed(0)
+{
+	startNewStack(0);
+}
+
+void ArenaAllocator::startNewStack(size_t minSize) {
+	if(mStackUsed > 0) {
+		mWasted += mStackSize - mStackUsed;
+		mData.emplace_back(std::move(mStack));
 	}
+
+	size_t size = std::max(minSize, mBlockSize);
+	mStack.reset(new char[size]); mTotal += size;
+
+	mStackSize  = size;
+	mStackUsed  = 0;
+}
+
+void* ArenaAllocator::allocate(size_t n) {
+	if(mStackUsed + n > mStackSize) { // TODO: is this right? Should it be >=?
+		startNewStack(n);
+	}
+
+	void* result = mStack.get() + mStackUsed;
+	mStackUsed += n;
 
 	return result;
 }
 
 char* ArenaAllocator::allocateString(const char *s, size_t len) {
 	char* re = (char*) allocate(len + 1);
-	if(re) {
-		memcpy(re, s, len);
-		re[len] = '\0';
-	}
-	else {
-		puts("ArenaAllocator: Allocation failure!");
-		exit(-2);
-	}
+	std::copy(s, s + len, re);
+	re[len] = '\0';
 	return re;
-}
-
-size_t ArenaAllocator::size() const {
-	return mSize;
-}
-
-size_t ArenaAllocator::wasted() const {
-	return mWasted + mStackAllocator.remaining();
 }

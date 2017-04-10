@@ -10,7 +10,7 @@
 #include "Timer.hpp"
 
 WordDatabase::WordDatabase() :
-	mAllocator(1 << 15)
+	mAllocator(1 << 14)
 {}
 
 bool WordDatabase::load(const char *path) {
@@ -42,10 +42,10 @@ bool WordDatabase::load(const char *path) {
 	puts  ("Memory requirements: ");
 	printf(" - Raw file:         %zu\n", file.size());
 	printf(" - Database:         %zu (%zu words)\n", mWords.size() * sizeof(Word), mWords.size());
-	printf(" - Raw word storage: %zu (%zu wasted = %f%%)\n", mAllocator.size(), mAllocator.wasted(), mAllocator.wasted() * 100.f / mAllocator.size());
+	printf(" - Raw word storage: %zu (%zu wasted = %f%%)\n", mAllocator.total(), mAllocator.wasted(), mAllocator.wasted() * 100.f / mAllocator.total());
 	puts  (" - Total:");
-	printf("   - Persistent:     %zu\n", mWords.size() * sizeof(Word) + mAllocator.size());
-	printf("   - Parsing:        %zu (+ rapidxml data structure size)\n", mWords.size() * sizeof(Word) + mAllocator.size() + file.size());
+	printf("   - Persistent:     %zu\n", mWords.size() * sizeof(Word) + mAllocator.total());
+	printf("   - Parsing:        %zu (+ rapidxml data structure size)\n", mWords.size() * sizeof(Word) + mAllocator.total() + file.size());
 
 	return true;
 }

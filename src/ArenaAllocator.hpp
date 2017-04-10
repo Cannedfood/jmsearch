@@ -5,52 +5,25 @@
 #include <cstddef>
 
 class ArenaAllocator {
-	size_t                        mSize;
-	size_t                        mWasted;
-	size_t                        mBlockSize;
+	size_t mTotal;
+	size_t mWasted;
+
 	std::deque<std::unique_ptr<char[]>> mData;
 
-	struct StackAllocator {
-		size_t                  mUsed;
-		size_t                  mSize;
-		std::unique_ptr<char[]> mBlock;
+	size_t mBlockSize;
 
-		StackAllocator(size_t size) :
-			mUsed(0),
-			mSize(size),
-			mBlock(new char[size])
-		{}
+	std::unique_ptr<char[]> mStack;
+	size_t                  mStackSize;
+	size_t                  mStackUsed;
 
-		char* allocate(size_t n) {
-			if(n == 0) return nullptr;
-
-			char* result = nullptr;
-			if(mUsed + n < mSize) { // TODO: can this be <= ?
-				result = mBlock.get() + mUsed;
-				mUsed += n;
-			}
-			return result;
-		}
-
-		bool empty() const { return mUsed == 0; }
-		size_t remaining() const { return mSize - mUsed; }
-	} mStackAllocator;
-
+	void startNewStack(size_t minSize);
 public:
-	ArenaAllocator(ArenaAllocator& other) = delete;
-
-	ArenaAllocator(size_t block_size = 8192) :
-		mSize(block_size),
-		mWasted(0),
-		mBlockSize(block_size),
-		mStackAllocator(mBlockSize)
-	{}
+	ArenaAllocator(size_t block_size = 8192);
+	ArenaAllocator(const ArenaAllocator& other) = delete;
 
 	void* allocate(size_t n);
-
 	char* allocateString(const char* s, size_t len);
 
-	size_t size() const;
-
-	size_t wasted() const;
+	size_t total()  const { return mTotal; }
+	size_t wasted() const { return mWasted + mStackSize - mStackUsed; }
 };
