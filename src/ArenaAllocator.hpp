@@ -32,13 +32,15 @@ class ArenaAllocator {
 	} mStackAllocator;
 
 public:
+	ArenaAllocator(ArenaAllocator& other) = delete;
+
 	ArenaAllocator(size_t block_size = 8192) :
 		mWasted(0),
 		mBlockSize(block_size),
 		mStackAllocator(mBlockSize)
 	{}
 
-	char* allocate(size_t n);
+	void* allocate(size_t n);
 
 	char* allocateString(const char* s, size_t len);
 

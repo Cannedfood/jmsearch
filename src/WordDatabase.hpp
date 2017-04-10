@@ -43,6 +43,8 @@ class WordDatabase {
 
 public:
 	WordDatabase();
+	WordDatabase(const WordDatabase&) = delete;
+	WordDatabase(WordDatabase&&)      = delete;
 
 	static std::string Romaji2Hiragana(std::string s);
 	static std::string Romaji2Katakana(std::string s);

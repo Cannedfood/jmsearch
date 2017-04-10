@@ -1,76 +1,65 @@
 #include "Word.hpp"
 
-extern "C" {
-#	include <memory.h>
-}
+Strings::Strings() :
+	mPointers(nullptr),
+	mLength(0)
+{}
 
+Strings::Strings(const char** data, size_t length) :
+	mPointers(data),
+	mLength(length)
+{}
 
-template<typename T, size_t len>
-T** findEmpty(T* (&t)[len]) {
-	for (size_t i = 0; i < len; i++) {
-		if(t[i] == nullptr)
-			return &t[i];
-	}
-	return nullptr;
+Strings::Strings(const char** data, size_t length, ArenaAllocator& alloc) {
+	const char** my_data = (const char**) alloc.allocate(sizeof(const char*) * length);
+	std::copy(data, data + length, my_data);
+	mPointers = my_data;
+	mLength = length;
 }
 
 bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
-	memset(mKanji,    0, sizeof(mKanji));
-	memset(mKana,     0, sizeof(mKana));
-	memset(mMeaning,  0, sizeof(mMeaning));
+	std::vector<const char*> strings;
 
-	rapidxml::xml_node<>* k_ele = node->first_node("k_ele", 5, true);
-	while(k_ele) {
-		if(rapidxml::xml_node<>* keb = k_ele->first_node("keb", 3, true)) {
-			if(const char** s = findEmpty(mKanji)) {
-				*s = alloc.allocateString(keb->value(), keb->value_size());
+	{
+		rapidxml::xml_node<>* k_ele = node->first_node("k_ele", 5, true);
+		while(k_ele) {
+			if(rapidxml::xml_node<>* keb = k_ele->first_node("keb", 3, true)) {
+				strings.push_back(alloc.allocateString(keb->value(), keb->value_size()));
 			}
-			else {
-				// puts("Not enough kanji space!");
-				break;
-			}
+			k_ele = k_ele->next_sibling("k_ele", 5, true);
 		}
-		k_ele = k_ele->next_sibling("k_ele", 5, true);
+
+		mKanji = Strings(strings.data(), strings.size(), alloc);
+		strings.clear();
 	}
 
-	rapidxml::xml_node<>* r_ele = node->first_node("r_ele", 5, true);
-	while(r_ele) {
-		if(rapidxml::xml_node<>* reb = r_ele->first_node("reb", 3, true)) {
-			if(const char** s = findEmpty(mKana)) {
-				*s = alloc.allocateString(reb->value(), reb->value_size());
+	{
+		rapidxml::xml_node<>* r_ele = node->first_node("r_ele", 5, true);
+		while(r_ele) {
+			if(rapidxml::xml_node<>* reb = r_ele->first_node("reb", 3, true)) {
+				strings.push_back(alloc.allocateString(reb->value(), reb->value_size()));
 			}
-			else {
-				// puts("Not enough kana space!");
-				break;
-			}
+			r_ele = r_ele->next_sibling("r_ele", 5, true);
 		}
-		r_ele = r_ele->next_sibling("r_ele", 5, true);
+
+		mKana = Strings(strings.data(), strings.size(), alloc);
+		strings.clear();
 	}
 
-	rapidxml::xml_node<>* sense = node->first_node("sense", 5, true);
-	while(sense) {
-		rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true);
-		while(gloss) {
-			if(const char** s = findEmpty(mMeaning)) {
-				*s = alloc.allocateString(gloss->value(), gloss->value_size());
+	{
+		rapidxml::xml_node<>* sense = node->first_node("sense", 5, true);
+		while(sense) {
+			rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true);
+			while(gloss) {
+				strings.push_back(alloc.allocateString(gloss->value(), gloss->value_size()));
+				gloss = gloss->next_sibling("gloss", 5, true);
 			}
-			else
-				goto L_BreakSenseLoop;
-			gloss = gloss->next_sibling("gloss", 5, true);
+			sense = sense->next_sibling("sense", 5, true);
 		}
-		sense = sense->next_sibling("sense", 5, true);
-	}
-L_BreakSenseLoop:
 
-	/*
-	if(rapidxml::xml_node<>* sense = node->first_node("sense", 5, true)) {
-		if(rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true)) {
-			if(const char** s = findEmpty(mMeaning)) {
-				*s = alloc.allocateString(gloss->value(), gloss->value_size());
-			}
-		}
+		mMeaning = Strings(strings.data(), strings.size(), alloc);
+		strings.clear();
 	}
-	*/
 
 	return true;
 }

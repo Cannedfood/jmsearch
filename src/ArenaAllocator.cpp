@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstdio>
 
-char* ArenaAllocator::allocate(size_t n) {
+void* ArenaAllocator::allocate(size_t n) {
 	char* result = mStackAllocator.allocate(n);
 
 	if(!result) // -> remaining space too small
@@ -21,7 +21,7 @@ char* ArenaAllocator::allocate(size_t n) {
 }
 
 char* ArenaAllocator::allocateString(const char *s, size_t len) {
-	char* re = allocate(len + 1);
+	char* re = (char*) allocate(len + 1);
 	if(re) {
 		memcpy(re, s, len);
 		re[len] = '\0';
