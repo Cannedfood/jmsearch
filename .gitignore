@@ -1,7 +1,12 @@
+# Folder for your own stuff
+my
+
+# Compilation folders  & Project files
 bin
 obj
 *.make
 Makefile
 
+# Temporary files and xml files
 jmsearch
 *.xml
