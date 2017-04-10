@@ -166,12 +166,12 @@ std::string WordDatabase::Romaji2Hiragana(std::string s) {
 			case 'o': result += u8"お"; i += 1; break;
 			case 'k':
 			switch (s[i + 1]) {
+				case 'k': result += u8"っ"; i += 1; break;
 				case 'a': result += u8"か"; i += 2; break;
 				case 'i': result += u8"き"; i += 2; break;
 				case 'u': result += u8"く"; i += 2; break;
 				case 'e': result += u8"け"; i += 2; break;
 				case 'o': result += u8"こ"; i += 2; break;
-				case 'k': result += u8"っ"; i += 1; break;
 				case 'y': if(i + 2 < s.size()) {
 					switch (s[i + 2]) {
 						case 'a': result += u8"きゃ"; i += 3; break;
@@ -184,11 +184,11 @@ std::string WordDatabase::Romaji2Hiragana(std::string s) {
 			} break;
 			case 's':
 			switch (s[i + 1]) {
+				case 's': result += u8"っ"; i += 1; break;
 				case 'a': result += u8"さ"; i += 2; break;
 				case 'u': result += u8"す"; i += 2; break;
 				case 'e': result += u8"せ"; i += 2; break;
 				case 'o': result += u8"そ"; i += 2; break;
-				case 's': result += u8"っ"; i += 1; break;
 				case 'h': if(i + 2 < s.size()) {
 					switch (s[i + 2]) {
 						case 'a': result += u8"しゃ"; i += 3; break;
@@ -202,11 +202,11 @@ std::string WordDatabase::Romaji2Hiragana(std::string s) {
 			} break;
 			case 't':
 			switch (s[i + 1]) {
+				case 't': result += u8"っ"; i += 1; break;
 				case 'a': result += u8"た"; i += 2; break;
 				case 's': result += u8"つ"; i += 3; break;
 				case 'e': result += u8"て"; i += 2; break;
 				case 'o': result += u8"と"; i += 2; break;
-				case 't': result += u8"っ"; i += 1; break;
 				default: i += 1; break;
 			} break;
 			case 'n':
@@ -352,6 +352,7 @@ std::string WordDatabase::Romaji2Hiragana(std::string s) {
 			} break;
 			case 'p':
 			switch (s[i + 1]) {
+				case 'p': result += u8"っ"; i += 1; break;
 				case 'a': result += u8"ぱ"; i += 2; break;
 				case 'i': result += u8"ぴ"; i += 2; break;
 				case 'u': result += u8"ぷ"; i += 2; break;
@@ -379,6 +380,7 @@ std::string WordDatabase::Romaji2Hiragana(std::string s) {
 			break;
 			case 'c': if(i + 2 <= s.size() && s[i + 1] == 'h') {
 				switch (s[i + 2]) {
+					case 'c': result += u8"っ"; i += 1; break;
 					case 'a': result += u8"ちゃ"; i += 3; break;
 					case 'u': result += u8"ちゅ"; i += 3; break;
 					case 'o': result += u8"ちょ"; i += 3; break;
