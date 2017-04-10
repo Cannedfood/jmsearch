@@ -41,23 +41,29 @@ int main(int argc, char** argv) {
 
 			printf(" - ");
 
-			if(w->mKanji[0]) {
+			if(w->mKanji.size()) {
 				printf("%s", w->mKanji[0]);
-				for (size_t i = 1; i < w->mKanji.length() && w->mKanji[i]; i++)
+				for (size_t i = 1; i < w->mKanji.size() && w->mKanji[i]; i++)
 					printf(" / %s", w->mKanji[i]);
 				printf("\n   ");
 			}
 
-			if(w->mKana[0]) {
+			if(w->mKana.size()) {
 				printf("%s", w->mKana[0]);
-				for (size_t i = 1; i < w->mKana.length() && w->mKana[i]; i++)
+				for (size_t i = 1; i < w->mKana.size() && w->mKana[i]; i++)
 					printf(" / %s", w->mKana[i]);
 				printf("\n");
 			}
 
-			for(const char* m : w->mMeaning) {
-				if(m == nullptr) break;
-				printf("   %s\n", m);
+			for(const Sense& s : w->mSenses) {
+				bool first = true;
+				for(const char* m : s.mMeanings) {
+					if(first) {
+						printf("  - %s\n", m);
+						first = false;
+					}
+					else printf("    %s\n", m);
+				}
 			}
 		}
 

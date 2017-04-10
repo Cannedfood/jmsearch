@@ -4,4 +4,4 @@ obj
 Makefile
 
 jmsearch
-JMdict_e.xml
+*.xml

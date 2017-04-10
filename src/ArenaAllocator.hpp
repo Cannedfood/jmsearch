@@ -22,6 +22,8 @@ class ArenaAllocator {
 		{}
 
 		char* allocate(size_t n) {
+			if(n == 0) return nullptr;
+
 			char* result = nullptr;
 			if(mUsed + n < mSize) { // TODO: can this be <= ?
 				result = mBlock.get() + mUsed;

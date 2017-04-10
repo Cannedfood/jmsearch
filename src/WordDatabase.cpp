@@ -10,7 +10,7 @@
 #include "Timer.hpp"
 
 WordDatabase::WordDatabase() :
-	mAllocator(1 << 14)
+	mAllocator(1 << 15)
 {}
 
 bool WordDatabase::load(const char *path) {
@@ -107,12 +107,14 @@ void WordDatabase::searchMeaning(SearchState* state) {
 
 	const std::string& s = state->mTerm;
 	for (size_t i = 0; i < mWords.size(); i++) {
-		for (const char* m : mWords[i].mMeaning) {
-			if(testRelevance(state, m, false, &relevance)) {
-				state->mResults.emplace_back(SearchResult {
-					&mWords[i],
-					relevance
-				});
+		for (Sense& s : mWords[i].mSenses) {
+			for(const char* m : s.mMeanings) {
+				if(testRelevance(state, m, false, &relevance)) {
+					state->mResults.emplace_back(SearchResult {
+						&mWords[i],
+						relevance
+					});
+				}
 			}
 		}
 	}

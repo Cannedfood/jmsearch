@@ -1,23 +1,5 @@
 #include "Word.hpp"
 
-Strings::Strings() :
-	mPointers(nullptr),
-	mLength(0)
-{}
-
-Strings::Strings(const char** data, size_t length) :
-	mPointers(data),
-	mLength(length)
-{}
-
-Strings::Strings(const char** data, size_t length, ArenaAllocator& alloc) {
-	const char** my_data = (const char**) alloc.allocate(sizeof(const char*) * length);
-	std::copy(data, data + length, my_data);
-	mPointers = my_data;
-	mLength = length;
-}
-
-
 #include <vector>
 bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 	std::vector<const char*> strings;
@@ -49,19 +31,39 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 	}
 
 	{
-		strings.clear();
+		std::vector<Sense> senses;
 		rapidxml::xml_node<>* sense = node->first_node("sense", 5, true);
 		while(sense) {
+			senses.emplace_back();
+
+			// Parsing glosses
+			strings.clear();
 			rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true);
 			while(gloss) {
-				if(gloss->value_size())
+				if(gloss->value_size()){
 					strings.push_back(alloc.allocateString(gloss->value(), gloss->value_size()));
+				}
 				gloss = gloss->next_sibling("gloss", 5, true);
 			}
+
+			senses.back().mMeanings = Strings(strings.data(), strings.size(), alloc);
+
+			// Parsing cross-references
+			strings.clear();
+			rapidxml::xml_node<>* xref = sense->first_node("xref", 4, true);
+			while(xref) {
+				if(xref->value_size()) {
+					strings.push_back(alloc.allocateString(xref->value(), xref->value_size()));
+				}
+				xref = xref->next_sibling("xref", 4, true);
+			}
+
+			senses.back().mReferences = Strings(strings.data(), strings.size(), alloc);
+
 			sense = sense->next_sibling("sense", 5, true);
 		}
 
-		mMeaning = Strings(strings.data(), strings.size(), alloc);
+		mSenses = VectorView<Sense>(senses.data(), senses.size(), alloc);
 	}
 
 	return true;

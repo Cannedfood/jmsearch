@@ -52,13 +52,16 @@ If you're feeling adventurous you can also change the path in the sources
 ## TODO:
 (< means WIP)
 - Sort search results by how much they match **DONE**
-- Split meaning + reading from kanji <
-- Sort search results by relevance
+- Split meanings into senses (as it is in the xml) **DONE**
+- Sort search results by relevance <
+	- Read flags from xml <
 - Implement caching, so we don't have to parse xml files all the time (SLOW and high memory requirement)
+- Add support for the whole JMdict file (= Add russian german french italian spanish whatever support)
 - Clean up code & make more robust
 	- Create unittests
 		- Run a list of A LOT OF WORDS (dictionary & all 4-letter combinations) against Romaji2Hiragana and Romaji2Katakana to make sure it doesn't hang up
-		- Run the whole dictionary against Kana2Romaji
+		- Run a list of all english words against Kana2Romaji
+		- Run a list of all english words against the search
 - Search for similar sounding words e.g.
 	- せけん (seken) = world -> せっけん (sekken) = soap
 	- しょねん (shonen) = first year -> しょうねん (shounen) = boy
@@ -72,4 +75,4 @@ If you're feeling adventurous you can also change the path in the sources
 - Make it faster
 	- Don't brute force
 	- Heuristics: Find things with higher occurences faster
-- Detect inflections
+- Detect inflections?

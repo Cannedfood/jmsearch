@@ -5,8 +5,6 @@
 #include <cstdio>
 
 void* ArenaAllocator::allocate(size_t n) {
-	return malloc(n);
-
 	char* result = mStackAllocator.allocate(n);
 
 	if(!result) // -> remaining space too small
