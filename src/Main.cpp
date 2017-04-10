@@ -59,10 +59,12 @@ int main(int argc, char** argv) {
 				bool first = true;
 				for(const char* m : s.mMeanings) {
 					if(first) {
-						printf("  - %s\n", m);
+						printf("   - %s\n", m);
 						first = false;
 					}
-					else printf("    %s\n", m);
+					else {
+						printf("     %s\n", m);
+					}
 				}
 			}
 		}
