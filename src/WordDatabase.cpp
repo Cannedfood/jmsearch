@@ -108,7 +108,7 @@ void WordDatabase::searchMeaning(SearchState* state) {
 	const std::string& s = state->mTerm;
 	for (size_t i = 0; i < mWords.size(); i++) {
 		for (const char* m : mWords[i].mMeaning) {
-			if(testRelevance(state, m, true, &relevance)) {
+			if(testRelevance(state, m, false, &relevance)) {
 				state->mResults.emplace_back(SearchResult {
 					&mWords[i],
 					relevance

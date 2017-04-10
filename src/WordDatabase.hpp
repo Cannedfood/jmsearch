@@ -2,9 +2,10 @@
 
 #include <string>
 #include <cstdint>
-#include <set>
 
 #include "Word.hpp"
+
+#include <vector>
 
 struct SearchResult {
 	Word* word;

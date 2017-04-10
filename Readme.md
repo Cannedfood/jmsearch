@@ -52,8 +52,9 @@ If you're feeling adventurous you can also change the path in the sources
 ## TODO:
 (< means WIP)
 - Sort search results by how much they match **DONE**
-- Sort search results by relevance <
-- Split meaning + reading from kanji
+- Split meaning + reading from kanji <
+- Sort search results by relevance
+- Implement caching, so we don't have to parse xml files all the time (SLOW and high memory requirement)
 - Clean up code & make more robust
 	- Create unittests
 		- Run a list of A LOT OF WORDS (dictionary & all 4-letter combinations) against Romaji2Hiragana and Romaji2Katakana to make sure it doesn't hang up

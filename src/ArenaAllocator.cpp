@@ -5,6 +5,8 @@
 #include <cstdio>
 
 void* ArenaAllocator::allocate(size_t n) {
+	return malloc(n);
+
 	char* result = mStackAllocator.allocate(n);
 
 	if(!result) // -> remaining space too small
@@ -14,6 +16,7 @@ void* ArenaAllocator::allocate(size_t n) {
 			mData.emplace_back(std::move(mStackAllocator.mBlock));
 		}
 		mStackAllocator = StackAllocator(std::max(n * 2, mBlockSize));
+		mSize += mStackAllocator.mSize;
 		result = mStackAllocator.allocate(n);
 	}
 
@@ -34,10 +37,7 @@ char* ArenaAllocator::allocateString(const char *s, size_t len) {
 }
 
 size_t ArenaAllocator::size() const {
-	size_t result = 0;
-	for(const auto& v : mData)
-		result += v.size();
-	return result;
+	return mSize;
 }
 
 size_t ArenaAllocator::wasted() const {
