@@ -47,6 +47,22 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 		r_ele = r_ele->next_sibling("r_ele", 5, true);
 	}
 
+	rapidxml::xml_node<>* sense = node->first_node("sense", 5, true);
+	while(sense) {
+		rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true);
+		while(gloss) {
+			if(const char** s = findEmpty(mMeaning)) {
+				*s = alloc.allocateString(gloss->value(), gloss->value_size());
+			}
+			else
+				goto L_BreakSenseLoop;
+			gloss = gloss->next_sibling("gloss", 5, true);
+		}
+		sense = sense->next_sibling("sense", 5, true);
+	}
+L_BreakSenseLoop:
+
+	/*
 	if(rapidxml::xml_node<>* sense = node->first_node("sense", 5, true)) {
 		if(rapidxml::xml_node<>* gloss = sense->first_node("gloss", 5, true)) {
 			if(const char** s = findEmpty(mMeaning)) {
@@ -54,6 +70,7 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 			}
 		}
 	}
+	*/
 
 	return true;
 }
