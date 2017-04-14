@@ -7,11 +7,10 @@
 #define XML_EACH(FROM, NAME, VAR)\
 	rapidxml::xml_node<>* VAR = FROM->first_node(NAME, sizeof(NAME) - 1, true);\
 	VAR != nullptr;\
-	VAR = VAR->next_sibling(NAME, sizeof(NAME), true)
+	VAR = VAR->next_sibling(NAME, sizeof(NAME) - 1, true)
 
 bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 	std::vector<const char*> strings;
-	std::vector<std::string> stringStore;
 
 	{
 		strings.clear();
@@ -82,21 +81,20 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 					strings.push_back(alloc.allocateString(gloss->value(), gloss->value_size()));
 				}
 			}
-
 			senses.back().mMeanings = Strings(strings.data(), strings.size(), alloc);
+
 
 			// Parsing cross-references
 			strings.clear();
-
 			for(XML_EACH(sense, "xref", xref)) {
 				if(xref->value_size()) {
 					strings.push_back(alloc.allocateString(xref->value(), xref->value_size()));
 				}
 			}
+			senses.back().mReferences = Strings(strings.data(), strings.size(), alloc);
 
 			// TODO: stagk, stagr, pos, ant, field, misc, s_inf, lsource, dial, gloss
 
-			senses.back().mReferences = Strings(strings.data(), strings.size(), alloc);
 		}
 
 		mSenses = VectorView<Sense>(senses.data(), senses.size(), alloc);

@@ -10,6 +10,7 @@ configurations {
 filter "configurations:debug"
 	optimize "Debug"
 	symbols "On"
+	defines "DEBUG=1" -- Only changes the output
 filter "configurations:release"
 	optimize "Speed"
 filter "*"

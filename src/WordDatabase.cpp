@@ -16,12 +16,16 @@ WordDatabase::WordDatabase() :
 bool WordDatabase::load(const char *path) {
 	Timer t;
 	rapidxml::file<> file(path);
+#ifdef DEBUG
 	printf("Loading %s took %zums\n", path, t.milliseconds());
+#endif // DEBUG
 	t.start();
 
 	rapidxml::xml_document<> doc;
 	doc.parse<0>(file.data());
+#ifdef DEBUG
 	printf("Parsing %s took %zums\n", path, t.milliseconds());
+#endif // DEBUG
 	t.start();
 
 	rapidxml::xml_node<>* root = doc.first_node("JMdict");
@@ -37,8 +41,11 @@ bool WordDatabase::load(const char *path) {
 			mWords.emplace_back(std::move(w));
 		node = node->next_sibling("entry", 5, true);
 	}
+#ifdef DEBUG
 	printf("Converting data took %zums\n", t.milliseconds());
+#endif // DEBUG
 
+#ifdef DEBUG
 	puts  ("Memory requirements: ");
 	printf(" - Raw file:         %zu\n", file.size());
 	printf(" - Database:         %zu (%zu words)\n", mWords.size() * sizeof(Word), mWords.size());
@@ -46,6 +53,7 @@ bool WordDatabase::load(const char *path) {
 	puts  (" - Total:");
 	printf("   - Persistent:     %zu\n", mWords.size() * sizeof(Word) + mAllocator.total());
 	printf("   - Parsing:        %zu (+ rapidxml data structure size)\n", mWords.size() * sizeof(Word) + mAllocator.total() + file.size());
+#endif // debug
 
 	return true;
 }

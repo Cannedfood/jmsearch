@@ -16,6 +16,11 @@ public:
 		mData(nullptr)
 	{}
 
+	VectorView(const VectorView<T>& other) :
+		mLength(other.mLength),
+		mData(other.mData)
+	{}
+
 	VectorView(T* data, size_t length) :
 		mLength(length),
 		mData(data)
@@ -49,6 +54,7 @@ struct Sense {
 };
 
 struct Word {
+	float             mFrequency;
 	Strings           mKanji;
 	Strings           mKana;
 	VectorView<Sense> mSenses;
