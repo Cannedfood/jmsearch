@@ -27,6 +27,7 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 	{
 		strings.clear();
 		for(XML_EACH(node, "r_ele", r_ele)) {
+			/*
 			bool ok    = false;
 			bool ik    = false;
 			bool oik   = false;
@@ -56,6 +57,7 @@ bool Word::parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc) {
 					fprintf(stderr, "'\n");
 				}
 			}
+			*/
 
 			if(rapidxml::xml_node<>* reb = r_ele->first_node("reb", 3, true)) {
 				strings.push_back(alloc.allocateString(reb->value(), reb->value_size()));
