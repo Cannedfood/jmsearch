@@ -43,8 +43,9 @@ public:
 using Strings = VectorView<const char*>;
 
 struct Sense {
-	Strings mReferences;
-	Strings mMeanings;
+	Strings     mReferences;
+	Strings     mMeanings;
+	const char* mFlags;
 };
 
 struct Word {

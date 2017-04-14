@@ -10,7 +10,7 @@
 #include "Timer.hpp"
 
 WordDatabase::WordDatabase() :
-	mAllocator(1 << 14)
+	mAllocator(1 << 16) // ~65KB blocks
 {}
 
 bool WordDatabase::load(const char *path) {
