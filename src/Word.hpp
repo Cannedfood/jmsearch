@@ -25,9 +25,7 @@ public:
 		mLength(length),
 		mData((T*) alloc.allocate(length * sizeof(T)))
 	{
-		if(length) {
-			std::copy(data, data + length, mData);
-		}
+		std::copy(data, data + length, mData);
 	}
 
 	inline size_t size()                    const { return mLength; }

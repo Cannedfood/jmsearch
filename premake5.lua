@@ -9,7 +9,7 @@ configurations {
 
 filter "configurations:debug"
 	optimize "Debug"
-	flags "Symbols"
+	symbols "On"
 filter "configurations:release"
 	optimize "Speed"
 filter "*"
