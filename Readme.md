@@ -17,7 +17,9 @@ End the program by using ctrl-c or writing "~" and typing enter
 ## License
 Everything in this repository I created is licensed under creative commons CC0 1.0 (see LICENSE).
 
-Rapidxml however is dual licensed under the boost and MIT licenses: see src/rapidxml/license.txt
+Rapidxml is dual licensed under the boost and MIT licenses: see src/rapidxml/license.txt
+
+This software uses the EDICT and KANJIDIC dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence.
 
 ## Building
 
@@ -35,6 +37,13 @@ or use the `premake5.lua` with premake5.
 
 ## Installation
 *This will be improved in the future*
+
+If you are on a system supporting PKGBUILD (like ArchLinux):
+```
+mkdir jmdict_build && cd jmdict_build
+curl https://raw.githubusercontent.com/Cannedfood/jmsearch/master/PKGBUILD > PKGBUILD
+makepkg -i
+```
 
 JMsearch needs a uncompressed JMdict_e.xml in its working directory.
 - Download the **JMdict_e.gz** file from [here](http://www.edrdg.org/jmdict/edict_doc.html)
