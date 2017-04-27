@@ -31,9 +31,12 @@ git clone git@github.com:Cannedfood/jmsearch.git
 2. Build the library
 ```bash
 cd jmsearch
-g++ -std=c++14 -O2 src/*.cpp -o jmsearch
+g++ -std=c++14 -O2 src/*.cpp -ldl -o jmsearch
 ```
 or use the `premake5.lua` with premake5.
+
+3. It dynamically loads zlib when available to extract the dictionary files, so make sure it's installed.
+   Alternatively you can extract the dictionary file yourself and rename it to JMdict_e.xml
 
 ## Installation
 *This will be improved in the future*
@@ -47,13 +50,12 @@ makepkg -i
 
 Otherwise
 - Download the **JMdict_e.gz** file from [here](http://www.edrdg.org/jmdict/edict_doc.html)
-- Extract the file and rename it `JMdict_e.xml`
-```bash
-	# For example like this
-	gunzip -c JMdict_e.gz > JMdict_e.xml
-```
-- You have to start jmsearch within the directory of the unpacked `JMdict_e.xml` unless it is in `/usr/share/jmsearch/JMdict_e.xml`.
-If you're feeling adventurous you can also change the path in the sources
+- For the program to work the `JMdict_e.gz` in one of
+	- `/usr/share/jmsearch/JMdict_e.gz`
+	- `~/.local/share/jmsearch/JMdict_e.gz`
+	- or in the current working directory
+
+If you're feeling adventurous you can also change the paths in the sources
 
 ## TODO:
 (< means WIP)

@@ -10,6 +10,8 @@ arch=(
 	# Not tested on arm
 )
 
+depends=('zlib')
+
 provides=('jmsearch')
 
 
@@ -25,17 +27,17 @@ md5sums=(
 
 
 pkgver() {
-        cd "$srcdir/jmsearch"
-        printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+    cd "${srcdir}/jmsearch"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 prepare() {
-	mv 'JMdict_e' 'JMdict_e.xml'
+	mv 'JMdict_e' 'JMdict_e.xml' # Mostly for tests as it is extracted anyways
 }
 
 build() {
-	cd "$srcdir"
-	c++ ${CXXFLAGS} -O2 -std=c++14 "jmsearch/src/"*.cpp ${LDFLAGS} -o jmsearch_binary
+	cd "${srcdir}"
+	c++ ${CXXFLAGS} -O2 -std=c++14 "jmsearch/src/"*.cpp ${LDFLAGS} -ldl -o jmsearch_binary
 }
 
 check() {
@@ -46,7 +48,7 @@ check() {
 }
 
 package() {
+	install -Dm644 "JMdict_e.gz" "${pkgdir}/usr/share/jmsearch/JMdict_e.gz"
 	cd "${srcdir}"
-	install -Dm644 "JMdict_e.xml" "${pkgdir}/usr/share/jmsearch/JMdict_e.xml"
 	install -Dm755 "jmsearch_binary" "${pkgdir}/usr/bin/jmsearch"
 }

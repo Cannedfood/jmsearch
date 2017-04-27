@@ -72,16 +72,54 @@ void printDetailed(Word* w) {
 	}
 }
 
+#ifdef __unix__
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
+std::string system_res_dir() {
+	return "/usr/share/jmsearch/";
+}
+
+std::string user_res_dir() {
+	const char* base;
+	if((base = getenv("HOME")) == NULL) {
+		base = getpwuid(getuid())->pw_dir;
+	}
+
+	return std::string(base) + "/.local/share/jmsearch/";
+}
+
+#else // defined(__unix__)
+// TODO: implement for windows
+#	error "Not implemented for Windows"
+#endif
+
 int main(int argc, char** argv) {
 	WordDatabase database;
 
 	{
 		const char* path;
 
-		if(std::ifstream("JMdict_e.xml").good())
-			path = "JMdict_e.xml";
-		else if(std::ifstream("/usr/share/jmsearch/JMdict_e.xml").good())
-			path = "/usr/share/jmsearch/JMdict_e.xml";
+		if(
+			std::ifstream("JMdict_e.gz").good() ||
+			std::ifstream("JMdict_e.xml").good()
+		) {
+			path = "JMdict_e";
+		}
+		else if(
+			std::ifstream(user_res_dir() + "JMdict_e.xml").good() ||
+			std::ifstream(user_res_dir() + "JMdict_e.gz").good()
+		) {
+			path = ".local/share/jmsearch/JMdict_e";
+		}
+		else if(
+			std::ifstream(system_res_dir() + "JMdict_e.xml").good() ||
+			std::ifstream(system_res_dir() + "JMdict_e.gz").good()
+		) {
+			path = "/usr/share/jmsearch/JMdict_e";
+		}
 		else {
 			puts("Could not find JMdict_e.xml!");
 			exit(-1);

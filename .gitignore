@@ -10,3 +10,4 @@ Makefile
 # Temporary files and xml files
 jmsearch
 *.xml
+*.gz
