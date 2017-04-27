@@ -75,8 +75,20 @@ void printDetailed(Word* w) {
 int main(int argc, char** argv) {
 	WordDatabase database;
 
-	if(!database.load("JMdict_e.xml"))
-		return -1;
+	{
+		const char* path;
+
+		if(std::ifstream("JMdict_e.xml").good())
+			path = "JMdict_e.xml";
+		else if(std::ifstream("/usr/share/jmsearch/JMdict_e.xml").good())
+			path = "/usr/share/jmsearch/JMdict_e.xml";
+		else {
+			puts("Could not find JMdict_e.xml!");
+			exit(-1);
+		}
+		if(!database.load(path))
+			return -1;
+	}
 
 	SearchState search;
 	while (true) {

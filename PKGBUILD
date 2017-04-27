@@ -11,7 +11,7 @@ arch=(
 )
 
 source=(
-	'git+ssh://git@github.com/Cannedfood/jmsearch.git'
+	'git+https://www.github.com/Cannedfood/jmsearch'
 	'ftp://ftp.monash.edu.au/pub/nihongo/JMdict_e.gz'
 )
 
@@ -27,14 +27,13 @@ prepare() {
 
 build() {
 	cd "$srcdir"
-	c++ -std=c++14 "jmsearch/src/"*.cpp -o jmsearch_binary
+	c++ ${CXXFLAGS} -O2 -std=c++14 "jmsearch/src/"*.cpp ${LDFLAGS} -o jmsearch_binary
 }
 
 check() {
 	cd "$srcdir"
 
 	# Testing if the command crashes on lookup
-	printf "kirin\n5\n.the\n3"
 	printf "kirin\n5\n.the\n3" | ./jmsearch_binary > /dev/null
 }
 
