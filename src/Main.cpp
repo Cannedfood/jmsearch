@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 		while(search.mTerm.empty()) {
 			if(!std::cin.good()) exit(0);
 			puts("Enter a search term: (? for help)");
-			std::cin >> search.mTerm;
+			std::getline(std::cin, search.mTerm);
 		}
 
 		if(search.mTerm == "~") break;
