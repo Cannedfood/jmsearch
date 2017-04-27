@@ -32,6 +32,7 @@ struct SearchState {
 		float cutoff     = 60;
 	} mRelevance;
 
+	std::string               mLastTerm;
 	std::string               mTerm;
 	std::vector<SearchResult> mResults;
 	size_t                    mTime;

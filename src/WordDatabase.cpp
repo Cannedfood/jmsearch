@@ -140,19 +140,30 @@ float testWord(SearchState* state, const std::string& term, Word& w, uint32_t fl
 	return max_relevance;
 }
 
-void WordDatabase::search(SearchState* state, uint32_t flags) {
+void WordDatabase::search(SearchState* state, uint32_t all_flags) {
 	Timer t;
 
-	std::string term;
-
-	for(size_t i = 0; i < mWords.size(); i++) {
-		float relevance = testWord(state, state->mTerm, mWords[i], flags);
-		if(relevance >= state->mRelevance.cutoff) {
-			state->mResults.emplace_back(SearchResult {
-				&mWords[i],
-				relevance
-			});
+	auto searchAll = [=](const std::string& term, uint32_t flags) {
+		for(size_t i = 0; i < mWords.size(); i++) {
+			float relevance = testWord(state, term, mWords[i], flags);
+			if(relevance >= state->mRelevance.cutoff) {
+				state->mResults.emplace_back(SearchResult {
+					&mWords[i],
+					relevance
+				});
+			}
 		}
+	};
+
+	if(all_flags & (SEARCH_CONVERT_HIRAGANA | SEARCH_CONVERT_KATAKANA)) {
+		std::string hiragana = Romaji2Hiragana(state->mTerm);
+		searchAll(hiragana, all_flags & ~SEARCH_MEANING);
+		all_flags &= ~SEARCH_KANA_KANJI;
+		printf("Also searching for '%s'\n", hiragana.c_str());
+	}
+
+	if(all_flags) {
+		searchAll(state->mTerm, all_flags);
 	}
 
 	cleanResults(state);

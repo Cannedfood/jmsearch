@@ -1,6 +1,6 @@
-pkgname='jmsearch'
+pkgname='jmsearch-git'
 pkgdesc='A command line japanese-english dictionary using the JMdict file'
-pkgver='0.1'
+pkgver='0.2'
 pkgrel=1
 license=('')
 
@@ -10,16 +10,24 @@ arch=(
 	# Not tested on arm
 )
 
+provides=('jmsearch')
+
+
 source=(
-	'git+https://www.github.com/Cannedfood/jmsearch'
+	"jmsearch::git+https://github.com/Cannedfood/jmsearch"
 	'ftp://ftp.monash.edu.au/pub/nihongo/JMdict_e.gz'
 )
 
 md5sums=(
-	'SKIP'
-	'f41db49f3a5e51b5fe96530355faa38f'
+	'SKIP' # git -> unecessary
+	'SKIP' # JMdict_e.gz : Constantly changes
 )
 
+
+pkgver() {
+        cd "$srcdir/jmsearch"
+        printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
 
 prepare() {
 	mv 'JMdict_e' 'JMdict_e.xml'
@@ -34,7 +42,7 @@ check() {
 	cd "$srcdir"
 
 	# Testing if the command crashes on lookup
-	printf "kirin\n5\n.the\n3" | ./jmsearch_binary > /dev/null
+	printf "kirin\n5\nbicycle\n3" | ./jmsearch_binary > /dev/null
 }
 
 package() {

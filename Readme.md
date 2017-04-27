@@ -10,7 +10,7 @@ Also **⇛ it requires a utf8 and japanese font compatible terminal to work ⇚*
 
 After starting it you can search a word by typing it pressing enter.
 
-By default it assumes you search in romaji/kana, however you can prefix your search with a dot . to search within the meanings (e.g. ".bicycle")
+By default it searches everywhere (meanings & kana & romaji), I will improve that soon.
 
 End the program by using ctrl-c or writing "~" and typing enter
 

@@ -95,24 +95,23 @@ int main(int argc, char** argv) {
 		search.mTerm.clear();
 		while(search.mTerm.empty()) {
 			if(!std::cin.good()) exit(0);
-			puts("Enter a search term, ? for help, or ~ to exit:");
+			puts("Enter a search term: (? for help)");
 			std::cin >> search.mTerm;
 		}
 
 		if(search.mTerm == "~") break;
 
 		if(search.mTerm == "?") {
-			puts("  Japanese -> English search: Just write a word (romaji or kana currently)");
-			puts("  English  -> Japanese search: Write a word prefixed with . e.g. .tree");
-			puts("  More information about a result: write the number of the result.");
-			puts("  Write ~ to exit (Or use ctrl-C)");
+			puts("  - Type a word to search (in kanji, kana and meanings).");
+			puts("  - Write the number of a result to get more info. (Currently not actually more)");
+			puts("  - Write ~ to exit (Or use ctrl-C)");
 			continue;
 		}
 
 		if(search.mTerm.front() >= '0' && search.mTerm.front() <= '9') {
 			size_t idx = strtoull(search.mTerm.c_str(), nullptr, 10) - 1;
 			if(idx >= search.mResults.size()) {
-				printf("Search term index %zu does not exist.\n", idx);
+				printf("Search index %zu does not exist.\n", idx);
 			}
 			else {
 				printDetailed(search.mResults[idx].word);
@@ -122,14 +121,7 @@ int main(int argc, char** argv) {
 
 		search.mResults.clear();
 
-		if(search.mTerm.front() == '.') {
-			search.mTerm.erase(search.mTerm.begin());
-			database.search(&search, WordDatabase::SEARCH_MEANING);
-		}
-		else {
-			search.mTerm = WordDatabase::Romaji2Hiragana(search.mTerm).c_str();
-			database.search(&search, WordDatabase::SEARCH_KANA_KANJI);
-		}
+		database.search(&search, WordDatabase::SEARCH_KANA_KANJI_CNVT | WordDatabase::SEARCH_MEANING);
 
 		size_t index = 1;
 		// std::reverse(search.mResults.begin(), search.mResults.end());
