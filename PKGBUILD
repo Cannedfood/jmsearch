@@ -47,6 +47,6 @@ check() {
 
 package() {
 	cd "${srcdir}"
-	install -Dm644 "JMdict_e.xml" "${pkgdir}/usr/share/${pkgname}/JMdict_e.xml"
-	install -Dm755 "jmsearch_binary" "${pkgdir}/usr/bin/${pkgname}"
+	install -Dm644 "JMdict_e.xml" "${pkgdir}/usr/share/jmsearch/JMdict_e.xml"
+	install -Dm755 "jmsearch_binary" "${pkgdir}/usr/bin/jmsearch"
 }
