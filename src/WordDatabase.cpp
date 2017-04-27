@@ -59,21 +59,21 @@ bool WordDatabase::load(const char *path) {
 }
 
 static
-bool testRelevance(SearchState* state, const char* test, bool lowercasify, float* pRelevance) {
+bool testRelevance(const SearchState* state, const std::string& term, const char* test, bool lowercasify, float* pRelevance) {
 	const char* m0 = test;
 	const char* m  = test;
 
 	while(*m) {
-		if(*m == state->mTerm[0]) {
+		if(*m == term[0]) {
 			if(lowercasify) {
-				for (size_t k = 0; k < state->mTerm.size(); k++) {
-					if(m[k] == '\0' || state->mTerm[k] != tolower(m[k]))
+				for (size_t k = 0; k < term.size(); k++) {
+					if(m[k] == '\0' || term[k] != tolower(m[k]))
 						goto CONTINUE_OUTER;
 				}
 			}
 			else {
-				for (size_t k = 0; k < state->mTerm.size(); k++) {
-					if(m[k] == '\0' || state->mTerm[k] != m[k])
+				for (size_t k = 0; k < term.size(); k++) {
+					if(m[k] == '\0' || term[k] != m[k])
 						goto CONTINUE_OUTER;
 				}
 			}
@@ -84,12 +84,12 @@ bool testRelevance(SearchState* state, const char* test, bool lowercasify, float
 
 			// Matching factor
 			if(m == m0) { // Word at begin
-				if(m0len == state->mTerm.size())
+				if(m0len == term.size())
 					*pRelevance += state->mRelevance.matchExact;
 				else
 					*pRelevance += state->mRelevance.matchAtBegin;
 			}
-			else if(m == m0 + m0len - state->mTerm.size()) {
+			else if(m == m0 + m0len - term.size()) {
 				*pRelevance += state->mRelevance.matchSomewhere;
 			}
 
@@ -108,53 +108,81 @@ bool testRelevance(SearchState* state, const char* test, bool lowercasify, float
 	return false;
 }
 
-void WordDatabase::searchMeaning(SearchState* state) {
-	Timer t;
-
+static
+float testWord(SearchState* state, const std::string& term, Word& w, uint32_t flags) {
+	float max_relevance = 0;
 	float relevance;
 
-	const std::string& s = state->mTerm;
-	for (size_t i = 0; i < mWords.size(); i++) {
-		for (Sense& s : mWords[i].mSenses) {
+	if(flags & 1) {
+		for(const char* m : w.mKanji) {
+			if(testRelevance(state, term, m, false, &relevance) && (relevance > max_relevance)) {
+				max_relevance = relevance;
+			}
+		}
+	}
+
+	if(flags & 2) {
+		for(const char* m : w.mKana) {
+			if(testRelevance(state, term, m, false, &relevance) && (relevance > max_relevance))
+				max_relevance = relevance;
+		}
+	}
+
+	if(flags & 4) {
+		for (Sense& s : w.mSenses) {
 			for(const char* m : s.mMeanings) {
-				if(testRelevance(state, m, false, &relevance)) {
-					state->mResults.emplace_back(SearchResult {
-						&mWords[i],
-						relevance
-					});
-				}
+				if(testRelevance(state, term, m, true, &relevance) && relevance > max_relevance)
+					max_relevance = relevance;
 			}
 		}
 	}
 
-	state->mTime = t.milliseconds();
+	return max_relevance;
 }
 
-void WordDatabase::searchKana(SearchState* state) {
+void WordDatabase::search(SearchState* state, uint32_t flags) {
 	Timer t;
 
-	float relevance;
+	std::string term;
 
-	const std::string& s = state->mTerm;
-	for (size_t i = 0; i < mWords.size(); i++) {
-		for (const char* m : mWords[i].mKana) {
-			if(testRelevance(state, m, false, &relevance)) {
-				state->mResults.emplace_back(SearchResult {
-					&mWords[i],
-					relevance
-				});
-			}
+	for(size_t i = 0; i < mWords.size(); i++) {
+		float relevance = testWord(state, state->mTerm, mWords[i], flags);
+		if(relevance >= state->mRelevance.cutoff) {
+			state->mResults.emplace_back(SearchResult {
+				&mWords[i],
+				relevance
+			});
 		}
 	}
+
+	cleanResults(state);
 
 	state->mTime = t.milliseconds();
 }
 
-void WordDatabase::sortResults(SearchState* state) {
-	// Using stable sort because we will presort the list of words
-	std::stable_sort(state->mResults.begin(), state->mResults.end(), [](const auto& a, const auto& b) {
-		return a.relevance < b.relevance;
-	});
+void WordDatabase::cleanResults(SearchState* state) {
+	// Removing duplicate results
+	std::sort(state->mResults.begin(), state->mResults.end(),
+		[](const auto& a, const auto& b) {
+			if(a.word != b.word)
+				return a.word < b.word;
+			else
+				return a.relevance < b.relevance;
+		}
+	);
+
+	std::unique(state->mResults.begin(), state->mResults.end(),
+		[](const auto& a, const auto& b) {
+			return a.word == b.word;
+		}
+	);
+
+	// Sorting for relevance
+	std::stable_sort(state->mResults.begin(), state->mResults.end(),
+		[](const auto& a, const auto& b) {
+			return a.relevance < b.relevance;
+		}
+	);
 }
 
 

@@ -74,6 +74,7 @@ void printDetailed(Word* w) {
 
 int main(int argc, char** argv) {
 	WordDatabase database;
+
 	if(!database.load("JMdict_e.xml"))
 		return -1;
 
@@ -109,16 +110,14 @@ int main(int argc, char** argv) {
 
 		search.mResults.clear();
 
-		if(search.mTerm.front() != '.') {
-			search.mTerm = WordDatabase::Romaji2Hiragana(search.mTerm).c_str();
-			database.searchKana(&search);
+		if(search.mTerm.front() == '.') {
+			search.mTerm.erase(search.mTerm.begin());
+			database.search(&search, WordDatabase::SEARCH_MEANING);
 		}
 		else {
-			search.mTerm.erase(search.mTerm.begin());
-			database.searchMeaning(&search);
+			search.mTerm = WordDatabase::Romaji2Hiragana(search.mTerm).c_str();
+			database.search(&search, WordDatabase::SEARCH_KANA_KANJI);
 		}
-
-		database.sortResults(&search);
 
 		size_t index = 1;
 		// std::reverse(search.mResults.begin(), search.mResults.end());

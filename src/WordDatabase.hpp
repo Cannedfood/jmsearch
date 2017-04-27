@@ -42,6 +42,7 @@ class WordDatabase {
 	std::deque <Word>     mWords;
 	std::vector<uint32_t> mCandidates;
 
+	void singleSearch(SearchState* state, uint32_t flags);
 public:
 	WordDatabase();
 	WordDatabase(const WordDatabase&) = delete;
@@ -51,8 +52,18 @@ public:
 	static std::string Romaji2Katakana(std::string s);
 
 	bool load(const char* path);
-	void searchMeaning(SearchState* state);
-	void searchKana   (SearchState* state);
-	void searchKanji  (SearchState* state);
-	void sortResults  (SearchState* state);
+
+	enum SearchFlags {
+		SEARCH_KANJI            = 1,
+		SEARCH_KANA             = 2,
+		SEARCH_MEANING          = 4,
+		SEARCH_CONVERT_HIRAGANA = 8,
+		SEARCH_CONVERT_KATAKANA = 16,
+
+		SEARCH_KANA_KANJI       = SEARCH_KANA | SEARCH_KANJI,
+		SEARCH_KANA_KANJI_CNVT  = SEARCH_KANA | SEARCH_KANJI | SEARCH_CONVERT_HIRAGANA | SEARCH_CONVERT_KATAKANA,
+	};
+
+	void search      (SearchState* state, uint32_t flags);
+	void cleanResults(SearchState* state);
 };
