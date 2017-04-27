@@ -13,6 +13,13 @@ struct SearchResult {
 };
 
 struct SearchState {
+private:
+	std::string               mLastTerm;
+	std::vector<SearchResult> mResults;
+	size_t                    mTime;
+
+	friend class WordDatabase;
+public:
 	struct {
 		// Matching factors (mutually exclusive)
 		float matchExact     = 100; // That the word is exactly what you searched for
@@ -30,12 +37,11 @@ struct SearchState {
 
 		// Cuttof (How much relevance it at least needed, doesn't do anything when <= matchSomewhere)
 		float cutoff     = 60;
-	} mRelevance;
+	} relevance;
 
-	std::string               mLastTerm;
-	std::string               mTerm;
-	std::vector<SearchResult> mResults;
-	size_t                    mTime;
+	const std::vector<SearchResult>& results()  const { return mResults; }
+	size_t                           time()     const { return mTime; }
+	const std::string&               lastTerm() const { return mLastTerm; }
 };
 
 class WordDatabase {
@@ -48,9 +54,6 @@ public:
 	WordDatabase();
 	WordDatabase(const WordDatabase&) = delete;
 	WordDatabase(WordDatabase&&)      = delete;
-
-	static std::string Romaji2Hiragana(std::string s);
-	static std::string Romaji2Katakana(std::string s);
 
 	bool load(const char* path);
 
@@ -65,6 +68,6 @@ public:
 		SEARCH_KANA_KANJI_CNVT  = SEARCH_KANA | SEARCH_KANJI | SEARCH_CONVERT_HIRAGANA | SEARCH_CONVERT_KATAKANA,
 	};
 
-	void search      (SearchState* state, uint32_t flags);
+	void search      (SearchState* state, const std::string& term, uint32_t flags);
 	void cleanResults(SearchState* state);
 };

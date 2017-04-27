@@ -1,13 +1,8 @@
-#include "rapidxml/rapidxml.hpp"
-#include "rapidxml/rapidxml_utils.hpp"
-
-#include "Timer.hpp"
-#include "ArenaAllocator.hpp"
-#include "Word.hpp"
 #include "WordDatabase.hpp"
 
 #include <iostream>
 #include <algorithm>
+#include <fstream>
 
 static
 void printResult(size_t num_results, size_t index, Word* w) {
@@ -130,43 +125,42 @@ int main(int argc, char** argv) {
 
 	SearchState search;
 	while (true) {
-		search.mTerm.clear();
-		while(search.mTerm.empty()) {
+		std::string term;
+
+		while(term.empty()) {
 			if(!std::cin.good()) exit(0);
 			puts("Enter a search term: (? for help)");
-			std::getline(std::cin, search.mTerm);
+			std::getline(std::cin, term);
 		}
 
-		if(search.mTerm == "~") break;
+		if(term == "~") break;
 
-		if(search.mTerm == "?") {
+		if(term == "?") {
 			puts("  - Type a word to search (in kanji, kana and meanings).");
 			puts("  - Write the number of a result to get more info. (Currently not actually more)");
 			puts("  - Write ~ to exit (Or use ctrl-C)");
 			continue;
 		}
 
-		if(search.mTerm.front() >= '0' && search.mTerm.front() <= '9') {
-			size_t idx = strtoull(search.mTerm.c_str(), nullptr, 10) - 1;
-			if(idx >= search.mResults.size()) {
+		if(term.front() >= '0' && term.front() <= '9') {
+			size_t idx = strtoull(term.c_str(), nullptr, 10) - 1;
+			if(idx >= search.results().size()) {
 				printf("Search index %zu does not exist.\n", idx);
 			}
 			else {
-				printDetailed(search.mResults[idx].word);
+				printDetailed(search.results()[idx].word);
 			}
 			continue;
 		}
 
-		search.mResults.clear();
-
-		database.search(&search, WordDatabase::SEARCH_KANA_KANJI_CNVT | WordDatabase::SEARCH_MEANING);
+		database.search(&search, term, WordDatabase::SEARCH_KANA_KANJI_CNVT | WordDatabase::SEARCH_MEANING);
 
 		size_t index = 1;
 		// std::reverse(search.mResults.begin(), search.mResults.end());
-		for(const SearchResult& result : search.mResults) {
-			printResult(search.mResults.size(), index++, result.word);
+		for(const SearchResult& result : search.results()) {
+			printResult(search.results().size(), index++, result.word);
 		}
 
-		printf(" [ %zu results for \"%s\" in %zums ]\n", search.mResults.size(), search.mTerm.c_str(), search.mTime);
+		printf(" [ %zu results for \"%s\" in %zums ]\n", search.results().size(), term.c_str(), search.time());
 	}
 }
