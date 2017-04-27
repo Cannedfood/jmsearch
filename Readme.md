@@ -19,17 +19,17 @@ Everything in this repository I created is licensed under creative commons CC0 1
 
 Rapidxml is dual licensed under the boost and MIT licenses: see src/rapidxml/license.txt
 
-This software uses the EDICT and KANJIDIC dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence.
+This software uses the EDICT and KANJIDIC dictionary files. These files are the property of the Electronic Dictionary Research and Development Group, and are used in conformance with the Group's licence. You can get more information [here](http://www.edrdg.org/jmdict/j_jmdict.html)
 
 ## Building
 
 1. Clone the repository
-```
+```bash
 git clone git@github.com:Cannedfood/jmsearch.git
 ```
 
 2. Build the library
-```
+```bash
 cd jmsearch
 g++ -std=c++14 -O2 src/*.cpp -o jmsearch
 ```
@@ -39,33 +39,31 @@ or use the `premake5.lua` with premake5.
 *This will be improved in the future*
 
 If you are on a system supporting PKGBUILD (like ArchLinux):
-```
+```bash
 mkdir jmdict_build && cd jmdict_build
 curl https://raw.githubusercontent.com/Cannedfood/jmsearch/master/PKGBUILD > PKGBUILD
 makepkg -i
 ```
 
-JMsearch needs a uncompressed JMdict_e.xml in its working directory.
+Otherwise
 - Download the **JMdict_e.gz** file from [here](http://www.edrdg.org/jmdict/edict_doc.html)
-- Extract the file named `data` from it and rename it `JMdict_e.xml`
-- You have to start jmsearch within the directory of the unpacked `JMdict_e.xml` so you'll probably want to do something like
+- Extract the file and rename it `JMdict_e.xml`
+```bash
+	# For example like this
+	gunzip -c JMdict_e.gz > JMdict_e.xml
 ```
-echo 'alias jmsearch="cd <folder with JMdict_e.xml> && <jmsearch executable>"' >> ~/.bashrc
-```
-and restart your terminal or
-```
-echo 'cd <folder wher JMdict_e.xml is> && <path to jmsearch> ${@}' > /bin/jmsearch
-```
+- You have to start jmsearch within the directory of the unpacked `JMdict_e.xml` unless it is in `/usr/share/jmsearch/JMdict_e.xml`.
 If you're feeling adventurous you can also change the path in the sources
 
 ## TODO:
 (< means WIP)
 - Sort search results by how much they match **DONE**
 - Split meanings into senses (as it is in the xml) **DONE**
-- Sort search results by relevance <
-	- Read flags from xml <
 - Implement caching, so we don't have to parse xml files all the time (SLOW and high memory requirement)
 - Add support for the whole JMdict file (= Add russian german french italian spanish whatever support)
+- Implement minimal incremental search (search in results if the search string simply got longer)
+- Sort search results by relevance
+	- Read flags from xml
 - Clean up code & make more robust
 	- Create unittests
 		- Run a list of A LOT OF WORDS (dictionary & all 4-letter combinations) against Romaji2Hiragana and Romaji2Katakana to make sure it doesn't hang up
