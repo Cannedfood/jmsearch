@@ -152,16 +152,34 @@ float testWord(SearchState* state, const std::string& term, Word& w, uint32_t fl
 void WordDatabase::search(SearchState* state, const std::string& term, uint32_t all_flags) {
 	Timer t;
 
-	state->mResults.clear();
+	if(term.find(state->lastTerm()) != std::string::npos && !state->lastTerm().empty()) {
+		all_flags |= SEARCH_RESULTS; // We can just filter the old results
+	}
 
-	auto searchAll = [=](const std::string& term, uint32_t flags) {
-		for(size_t i = 0; i < mWords.size(); i++) {
-			float relevance = testWord(state, term, mWords[i], flags);
-			if(relevance >= state->relevance.cutoff) {
-				state->mResults.emplace_back(SearchResult {
-					&mWords[i],
-					relevance
-				});
+	std::vector<SearchResult> old_results;
+	state->mResults.swap(old_results);
+
+	auto searchWords = [&](const std::string& term, uint32_t flags) {
+		if(flags & SEARCH_RESULTS) {
+			for(auto& r : old_results) {
+				float relevance = testWord(state, term, *r.word, flags);
+				if(relevance >= state->relevance.cutoff) {
+					state->mResults.emplace_back(SearchResult {
+						r.word,
+						relevance
+					});
+				}
+			}
+		}
+		else {
+			for(Word& w : mWords) {
+				float relevance = testWord(state, term, w, flags);
+				if(relevance >= state->relevance.cutoff) {
+					state->mResults.emplace_back(SearchResult {
+						&w,
+						relevance
+					});
+				}
 			}
 		}
 	};
@@ -169,18 +187,19 @@ void WordDatabase::search(SearchState* state, const std::string& term, uint32_t 
 	if(all_flags & (SEARCH_CONVERT_HIRAGANA | SEARCH_CONVERT_KATAKANA)) {
 		std::string hiragana = Romaji2Hiragana(term);
 		if(hiragana != term) {
-			searchAll(hiragana, all_flags & ~SEARCH_MEANING);
+			searchWords(hiragana, all_flags & ~SEARCH_MEANING);
 			all_flags &= ~SEARCH_KANA_KANJI;
 			printf("Also searching for '%s'\n", hiragana.c_str());
 		}
 	}
 
 	if(all_flags) {
-		searchAll(term, all_flags);
+		searchWords(term, all_flags);
 	}
 
 	cleanResults(state);
 
+	state->mLastTerm = term;
 	state->mTime = t.milliseconds();
 }
 
