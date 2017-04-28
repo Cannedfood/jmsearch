@@ -124,12 +124,24 @@ int main(int argc, char** argv) {
 	}
 
 	SearchState search;
+	uint32_t    flags =
+		WordDatabase::SEARCH_CONVERT_HIRAGANA |
+		WordDatabase::SEARCH_KANA |
+		WordDatabase::SEARCH_KANJI |
+		WordDatabase::SEARCH_MEANING;
+
 	while (true) {
 		std::string term;
 
 		while(term.empty()) {
 			if(!std::cin.good()) exit(0);
-			puts("Enter a search term: (? for help)");
+
+			std::string flagstring;
+			if(flags & WordDatabase::SEARCH_KANJI)            flagstring += 'k';
+			if(flags & WordDatabase::SEARCH_KANA)             flagstring += 'r';
+			if(flags & WordDatabase::SEARCH_MEANING)          flagstring += 'm';
+			if(flags & WordDatabase::SEARCH_CONVERT_HIRAGANA) flagstring += 'c';
+			printf("Enter a search term: (? for help) [+%s]\n", flagstring.c_str());
 			std::getline(std::cin, term);
 		}
 
@@ -137,8 +149,19 @@ int main(int argc, char** argv) {
 
 		if(term == "?") {
 			puts("  - Type a word to search (in kanji, kana and meanings).");
-			puts("  - Write the number of a result to get more info. (Currently not actually more)");
 			puts("  - Write ~ to exit (Or use ctrl-C)");
+			puts("  Extended use:");
+			puts("  - Write the number of a result to get more info. (Currently not actually more)");
+			puts("  Search mode: You can set flags to change what is searched for.");
+			puts("  - k: Search kanji");
+			puts("  - r: Search reading (kana)");
+			puts("  - m: Search meaning");
+			puts("  - c: Convert the search string from romaji to kana");
+			puts("  Use prefix a + to add flags, a - to remove flags or = to set the flags");
+			puts("  - e.g.");
+			puts("      +krmc (add all flags)");
+			puts("      -krmc (Remove all flags -> Search for nothing?!)");
+			puts("      =rc   (Search for romaji)");
 			continue;
 		}
 
@@ -153,7 +176,37 @@ int main(int argc, char** argv) {
 			continue;
 		}
 
-		database.search(&search, term, WordDatabase::SEARCH_KANA_KANJI_CNVT | WordDatabase::SEARCH_MEANING);
+		if(term.front() == '+' || term.front() == '=') {
+			for(char c : term) switch (c) {
+				case '+': break;
+				case '=': flags = 0; break;
+				case 'k': flags |= WordDatabase::SEARCH_KANJI;            break;
+				case 'r': flags |= WordDatabase::SEARCH_KANA;             break;
+				case 'm': flags |= WordDatabase::SEARCH_MEANING;          break;
+				case 'c': flags |= WordDatabase::SEARCH_CONVERT_HIRAGANA; break;
+				default: break;
+			}
+			continue;
+		}
+
+		if(term.front() == '-') {
+			for(char c : term) switch (c) {
+				case '-': break;
+				case 'k': flags &= ~WordDatabase::SEARCH_KANJI;            break;
+				case 'r': flags &= ~WordDatabase::SEARCH_KANA;             break;
+				case 'm': flags &= ~WordDatabase::SEARCH_MEANING;          break;
+				case 'c': flags &= ~WordDatabase::SEARCH_CONVERT_HIRAGANA; break;
+				default: break;
+			}
+			continue;
+		}
+
+		if(term.front() == '!') {
+			term.erase(0);
+			term = search.lastTerm() + term;
+		}
+
+		database.search(&search, term, flags);
 
 		size_t index = 1;
 		// std::reverse(search.mResults.begin(), search.mResults.end());

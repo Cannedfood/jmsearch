@@ -168,9 +168,11 @@ void WordDatabase::search(SearchState* state, const std::string& term, uint32_t 
 
 	if(all_flags & (SEARCH_CONVERT_HIRAGANA | SEARCH_CONVERT_KATAKANA)) {
 		std::string hiragana = Romaji2Hiragana(term);
-		searchAll(hiragana, all_flags & ~SEARCH_MEANING);
-		all_flags &= ~SEARCH_KANA_KANJI;
-		printf("Also searching for '%s'\n", hiragana.c_str());
+		if(hiragana != term) {
+			searchAll(hiragana, all_flags & ~SEARCH_MEANING);
+			all_flags &= ~SEARCH_KANA_KANJI;
+			printf("Also searching for '%s'\n", hiragana.c_str());
+		}
 	}
 
 	if(all_flags) {
