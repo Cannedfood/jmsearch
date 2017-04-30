@@ -230,6 +230,13 @@ std::string Romaji2Hiragana(const std::string& in) {
 				}
 			} else i++;
 			break;
+			case 'f': if(i + 1 <= s.size()) {
+				switch (s[i + 1]) {
+					case 'u': result += u8"ふ"; i += 2; break;
+					default: i += 1; break;
+				}
+			} else i++;
+			break;
 			case 'c': if(i + 2 <= s.size() && s[i + 1] == 'h') {
 				switch (s[i + 2]) {
 					case 'c': result += u8"っ"; i += 1; break;
@@ -241,6 +248,7 @@ std::string Romaji2Hiragana(const std::string& in) {
 				}
 			} else i++;
 			break;
+
 			default: result += s[i]; i += 1; break;
 		}
 		// printf("-> %s\n", result.c_str());
