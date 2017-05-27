@@ -12,7 +12,7 @@ After starting it you can search a word by typing it pressing enter.
 
 By default it searches everywhere (meanings & kana & romaji), I will improve that soon.
 
-End the program by using ctrl-c or writing "~" and typing enter
+End the program by using ctrl-d (unix) or ctrl-z (windows)
 
 ## License
 Everything in this repository I created is licensed under creative commons CC0 1.0 (see LICENSE).

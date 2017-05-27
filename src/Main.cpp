@@ -145,11 +145,13 @@ int main(int argc, char** argv) {
 			std::getline(std::cin, term);
 		}
 
-		if(term == "q") break;
-
 		if(term == "?") {
+#ifdef _WIN32
+			puts("  - Press ctrl-z to exit");
+#else
+			puts("  - Press ctrl-d to exit");
+#endif
 			puts("  - Type a word to search (in kanji, kana and meanings).");
-			puts("  - Write q to exit (Or use ctrl-C)");
 			puts("  Extended use:");
 			puts("  - Write the number of a result to get more info. (Currently not actually more)");
 			puts("  Search mode: You can set flags to change what is searched for.");
