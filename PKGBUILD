@@ -1,3 +1,5 @@
+#!/bin/makepkg
+
 pkgname='jmsearch-git'
 pkgdesc='A command line japanese-english dictionary using the JMdict file'
 pkgver='0.2'
@@ -17,7 +19,7 @@ provides=('jmsearch')
 
 source=(
 	"jmsearch::git+https://github.com/Cannedfood/jmsearch"
-	'ftp://ftp.monash.edu.au/pub/nihongo/JMdict_e.gz'
+	'ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz'
 )
 
 md5sums=(
@@ -32,7 +34,7 @@ pkgver() {
 }
 
 prepare() {
-	mv 'JMdict_e' 'JMdict_e.xml' # Mostly for tests as it is extracted anyways
+	mv 'JMdict' 'JMdict.xml' # Mostly for tests as it is extracted anyways
 }
 
 build() {
@@ -48,7 +50,7 @@ check() {
 }
 
 package() {
-	install -Dm644 "JMdict_e.gz" "${pkgdir}/usr/share/jmsearch/JMdict_e.gz"
+	install -Dm644 "JMdict.gz" "${pkgdir}/usr/share/jmsearch/JMdict.gz"
 	cd "${srcdir}"
 	install -Dm755 "jmsearch_binary" "${pkgdir}/usr/bin/jmsearch"
 }

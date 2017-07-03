@@ -55,7 +55,7 @@ public:
 	WordDatabase(const WordDatabase&) = delete;
 	WordDatabase(WordDatabase&&)      = delete;
 
-	bool load(const char* path);
+	bool load(const char* path, const char* locale = nullptr);
 
 	enum SearchFlags {
 		SEARCH_KANJI            = 1,

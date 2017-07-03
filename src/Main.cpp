@@ -98,28 +98,31 @@ int main(int argc, char** argv) {
 		const char* path;
 
 		if(
-			std::ifstream("JMdict_e.gz").good() ||
-			std::ifstream("JMdict_e.xml").good()
+			std::ifstream("JMdict.gz").good() ||
+			std::ifstream("JMdict.xml").good()
 		) {
-			path = "JMdict_e";
+			path = "JMdict";
 		}
 		else if(
-			std::ifstream(user_res_dir() + "JMdict_e.xml").good() ||
-			std::ifstream(user_res_dir() + "JMdict_e.gz").good()
+			std::ifstream(user_res_dir() + "JMdict.xml").good() ||
+			std::ifstream(user_res_dir() + "JMdict.gz").good()
 		) {
-			path = ".local/share/jmsearch/JMdict_e";
+			path = ".local/share/jmsearch/JMdict";
 		}
 		else if(
-			std::ifstream(system_res_dir() + "JMdict_e.xml").good() ||
-			std::ifstream(system_res_dir() + "JMdict_e.gz").good()
+			std::ifstream(system_res_dir() + "JMdict.xml").good() ||
+			std::ifstream(system_res_dir() + "JMdict.gz").good()
 		) {
-			path = "/usr/share/jmsearch/JMdict_e";
+			path = "/usr/share/jmsearch/JMdict";
 		}
 		else {
-			puts("Could not find JMdict_e.xml!");
+			puts("Could not find JMdict.xml or JMdict.gz!");
 			exit(-1);
 		}
-		if(!database.load(path))
+
+		const char* locale = nullptr;
+		if(argc > 1) locale = argv[1];
+		if(!database.load(path, locale))
 			return -1;
 	}
 

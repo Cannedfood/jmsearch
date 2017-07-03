@@ -17,7 +17,7 @@ WordDatabase::WordDatabase() :
 	mAllocator(1 << 16) // ~65KB blocks
 {}
 
-bool WordDatabase::load(const char *path) {
+bool WordDatabase::load(const char *path, const char* locale) {
 	Timer t;
 
 	std::vector<char> data;
@@ -46,7 +46,7 @@ bool WordDatabase::load(const char *path) {
 	rapidxml::xml_node<>* node = root->first_node("entry", 5, true);
 	while(node) {
 		Word w;
-		if(w.parse(node, mAllocator))
+		if(w.parse(node, mAllocator, locale))
 			mWords.emplace_back(std::move(w));
 		node = node->next_sibling("entry", 5, true);
 	}

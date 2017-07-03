@@ -59,5 +59,5 @@ struct Word {
 	Strings           mKana;
 	VectorView<Sense> mSenses;
 
-	bool parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc);
+	bool parse(rapidxml::xml_node<>* node, ArenaAllocator& alloc, const char* locale);
 };
