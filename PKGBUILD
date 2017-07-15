@@ -19,38 +19,44 @@ provides=('jmsearch')
 
 source=(
 	"jmsearch::git+https://github.com/Cannedfood/jmsearch"
-	'ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz'
 )
 
 md5sums=(
 	'SKIP' # git -> unecessary
-	'SKIP' # JMdict_e.gz : Constantly changes
 )
 
 
 pkgver() {
-    cd "${srcdir}/jmsearch"
+    cd "${srcdir}/jmsearch" || exit
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 prepare() {
-	mv 'JMdict' 'JMdict.xml' # Mostly for tests as it is extracted anyways
+	cd "${srcdir}" || exit
+
+	if [ -f '/usr/share/jmsearch/JMdict.gz' ]
+	then
+		echo "Dictionary file already found; Using it to minimize traffic."
+		cp '/usr/share/jmsearch/JMdict.gz' ./
+	fi
+
+	wget -q --show-progress --passive-ftp -c -O JMdict.gz 'ftp://ftp.monash.edu.au/pub/nihongo/JMdict.gz'
 }
 
 build() {
-	cd "${srcdir}"
+	cd "${srcdir}" || exit
 	c++ ${CXXFLAGS} -O2 -std=c++14 "jmsearch/src/"*.cpp ${LDFLAGS} -ldl -o jmsearch_binary
 }
 
 check() {
-	cd "$srcdir"
+	cd "$srcdir" || exit
 
 	# Testing if the command crashes on lookup
 	printf "kirin\n5\nbicycle\n3" | ./jmsearch_binary > /dev/null
 }
 
 package() {
+	cd "${srcdir}" || exit
 	install -Dm644 "JMdict.gz" "${pkgdir}/usr/share/jmsearch/JMdict.gz"
-	cd "${srcdir}"
 	install -Dm755 "jmsearch_binary" "${pkgdir}/usr/bin/jmsearch"
 }
